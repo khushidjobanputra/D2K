@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hashtag Genration</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='home.css')}}">
+    <script>
+        // Function to limit the word count in a textarea
+        function limitWords(textareaId, maxWords) {
+            var textarea = document.getElementById(textareaId);
+            var words = textarea.value.split(/\s+/); // Split the input into words using whitespace
+            if (words.length > maxWords) {
+                words.splice(maxWords); // Remove excess words
+                textarea.value = words.join(' '); // Update the textarea with the limited words
+            }
+        }
+        // Function to update real-time word count
+        function updateWordCount(textareaId, countId, maxWords) {
+            var textarea = document.getElementById(textareaId);
+            var countElement = document.getElementById(countId);
+
+            var words = textarea.value.trim().split(/\s+/);
+            var currentWordCount = words.length;
+
+            if (currentWordCount > maxWords) {
+                words.splice(maxWords);
+                textarea.value = words.join(' ');
+                currentWordCount = maxWords;
+            }
+
+            countElement.textContent = currentWordCount;
+        }
+
+        // Function to initialize the word count display
+        function initializeWordCount(textareaId, countId) {
+            var countElement = document.getElementById(countId);
+            countElement.textContent = '0';
+
+            // Update word count on input
+            document.getElementById(textareaId).addEventListener('input', function () {
+                updateWordCount(textareaId, countId, 499); // Adjust the maxWords parameter as needed
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="img-container">
+            <img src="{{ url_for('static', filename='images/home.png')}}" alt="Home">
+        </div>
+        <div class="content-container">
+            <div class="input-container">
+                <p id="input-label"><label for="myTextarea">Hashtag Generator</label></p>
+                <div class="text-container">
+                <form action="{{ url_for('generate_tags') }}" method="POST">
+                    <textarea id="myTextarea" oninput="updateWordCount('myTextarea', 'wordCount', 499)" rows="10"
+                    cols="50" placeholder="Enter your text here"></textarea>
+                </form>
+                    
+                <p id="words"><span id="wordCount">0</span>/499</p>
+                    </div>
+
+                <button type="submit" onclick="sendData()">Submit</button>
+            </div>
+            <div class="output-container">
+                <div class="keyword-container">
+                    <div class="key-label"><span>Keywords:</span></div>
+                    <div class="keys">
+                        
+                    </div>
+                </div>
+                <div class="keyword-container hashtag-container">
+                    <div class="key-label hash-label"><span>Hashtags:</span></div>
+                    <div class="keys hashes">
+                        
+                    </div>  
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Initialize the word count display
+        initializeWordCount('myTextarea', 'wordCount');
+        // document.getElementById('myTextarea').addEventListener('submit', function(event) {
+        //     event.preventDefault();
+        //     sendData();
+        // });
+
+        function sendData() {
+            var formData = document.getElementById('myTextarea').value;
+            // var formData = new FormData(document.getElementById('myTextarea'));
+            console.log(formData)
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/generate_tags', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-from-urlencoded');
+            xhr.onload = function() {
+                if (xhr.status == 200) {
+                    alert(xhr.responseText);
+                }
+            };
+            xhr.send('formData='+encodeURIComponent(formData));
+        }
+    </script>
+</body>
+
+</html>
